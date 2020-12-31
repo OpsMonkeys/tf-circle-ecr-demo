@@ -1,0 +1,31 @@
+version: 2.1
+
+anchors:
+  filters: &filters
+    filters:
+      branches:
+        only: main
+
+orbs:
+  aws-ecr: circleci/aws-ecr@6.15.2
+
+workflows:
+  build_and_push_image:
+    jobs:
+      - aws-ecr/build-and-push-image:
+          <<: *filters
+          name: Build and Push Docker Image
+          account-url: AWS_ECR_ACCOUNT_URL
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          region: AWS_DEFAULT_REGION
+          context: wordpress-test
+          create-repo: false
+          dockerfile: Dockerfile
+          no-output-timeout: 20m
+          path: .
+          profile-name: default
+          repo: wordpress
+          skip-when-tags-exist: false
+          tag: 'latest,$CIRCLE_SHA1'
+
